@@ -6,11 +6,16 @@ import org.junit.jupiter.api.Test;
 
 public class CabInvoiceGeneratorTest {
 
-    CabInvoiceGenerator cabInvoiceGenerator = null;
+    Ride[] rides = null;
+    CabInvoiceGenerator cabInvoiceGenerator;
+    InvoiceSummary expectedInvoiceSummary;
+    RideRepository rideRepository;
 
     @BeforeEach
     public void setUp() {
         cabInvoiceGenerator = new CabInvoiceGenerator();
+        rideRepository = new RideRepository();
+        cabInvoiceGenerator.setRideRepository(rideRepository);
     }
 
     @Test
@@ -32,8 +37,8 @@ public class CabInvoiceGeneratorTest {
     @Test
     void givenMultipleRides_whenCalculated_shouldReturnInvoiceSummary() {
         Ride[] rides = {
-                new Ride(5.0, 10),
-                new Ride(0.1, 1)
+                new Ride(CabRide.NORMAL, 5.0, 10),
+                new Ride(CabRide.NORMAL, 0.1, 1)
         };
         InvoiceSummary summary = cabInvoiceGenerator.calculateFare(rides);
         InvoiceSummary expectedValue = new InvoiceSummary(2, 65.0);
@@ -41,14 +46,15 @@ public class CabInvoiceGeneratorTest {
     }
 
     @Test
-    void givenMultipleRidesAndUserId_whenCalculated_shouldReturnInvoiceSummary() {
-        Ride[] rides = {new Ride(5.0, 10),
-                new Ride(0.1, 1)
+    void givenMultipleRidesWith2CategoryRides_whenCalculated_shouldReturnEqual() {
+        String userId = "asd";
+        rides = new Ride[]{
+                new Ride(CabRide.NORMAL, 2.0, 5),
+                new Ride(CabRide.PREMIUM, 0.1, 1)
         };
-        String userId = "1";
+        expectedInvoiceSummary = new InvoiceSummary(2, 45.0);
         cabInvoiceGenerator.addRide(userId,rides);
         InvoiceSummary summary = cabInvoiceGenerator.getInvoiceSummary(userId);
-        InvoiceSummary expectedValue = new InvoiceSummary(2, 65.0);
-        Assertions.assertEquals(summary, expectedValue);
+        Assertions.assertEquals(summary, expectedInvoiceSummary);
     }
 }

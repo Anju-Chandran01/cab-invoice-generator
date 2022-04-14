@@ -5,7 +5,7 @@ public class CabInvoiceGenerator {
     private static final int COST_PER_MINUTE = 1;
     private static final int COST_PER_KILOMETER = 10;
     private static final double MINIMUM_FARE = 5.0;
-    private final RideRepository rideRepository;
+    private RideRepository rideRepository;
 
     public CabInvoiceGenerator(){
         this.rideRepository = new RideRepository();
@@ -13,8 +13,8 @@ public class CabInvoiceGenerator {
 
     public InvoiceSummary calculateFare(Ride[] rides) {
         double totalFare = 0;
-        for (Ride ride:rides)
-            totalFare += this.calculateFare(ride.distance, ride.time);
+        for (Ride ride : rides)
+            totalFare += ride.cabRide.calculateCostOfRide(ride);
         return new InvoiceSummary(rides.length, totalFare);
     }
 
@@ -29,5 +29,9 @@ public class CabInvoiceGenerator {
 
     public InvoiceSummary getInvoiceSummary(String userId) {
         return this.calculateFare(rideRepository.getRides(userId));
+    }
+
+    public void setRideRepository(RideRepository rideRepository) {
+
     }
 }
